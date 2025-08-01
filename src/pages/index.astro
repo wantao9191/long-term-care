@@ -1,16 +1,59 @@
 ---
-
+// 首页 - 重定向到管理端登录
 ---
 
-<html lang="en">
+<html lang="zh-CN">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>长期护理管理系统</title>
+    <style is:global>
+      @import "@/styles/common.css";
+      html,body{
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+		<style>
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				margin: 0;
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				color: white;
+			}
+			.container {
+				text-align: center;
+			}
+			.loading {
+				display: inline-block;
+				width: 20px;
+				height: 20px;
+				border: 3px solid rgba(255,255,255,.3);
+				border-radius: 50%;
+				border-top-color: #fff;
+				animation: spin 1s ease-in-out infinite;
+				margin-right: 10px;
+			}
+			@keyframes spin {
+				to { transform: rotate(360deg); }
+			}
+		</style>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<div class="container">
+			<div class="loading"></div>
+			<p>正在加载管理端...</p>
+		</div>
 	</body>
 </html>
+
+<script>
+	// 重定向到管理端登录
+	window.location.replace('/admin/login');
+</script>

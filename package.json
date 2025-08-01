@@ -4,11 +4,52 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx src/scripts/seed.ts",
+    "db:test": "tsx src/scripts/test-db.ts",
+    "lint": "eslint . --ext .js,.ts,.vue",
+    "lint:fix": "eslint . --ext .js,.ts,.vue --fix",
+    "format": "prettier --write ."
   },
   "dependencies": {
-    "astro": "^5.12.3"
+    "@astrojs/node": "^9.3.0",
+    "@astrojs/vue": "^5.1.0",
+    "@element-plus/icons-vue": "^2.3.1",
+    "@types/bcryptjs": "^3.0.0",
+    "@vueuse/core": "^13.5.0",
+    "astro": "^5.12.3",
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^12.2.0",
+    "cookie": "^1.0.2",
+    "dotenv": "^17.2.1",
+    "drizzle-orm": "^0.44.3",
+    "element-plus": "^2.10.4",
+    "jsonwebtoken": "^9.0.2",
+    "pinia": "^3.0.3",
+    "postgres": "^3.4.7",
+    "vue": "^3.5.18",
+    "zod": "^4.0.10"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "@unocss/preset-attributify": "^66.3.3",
+    "@unocss/preset-icons": "^66.3.3",
+    "@unocss/preset-uno": "^66.3.3",
+    "drizzle-kit": "^0.31.4",
+    "eslint": "^9.32.0",
+    "eslint-plugin-vue": "^10.3.0",
+    "prettier": "^3.6.2",
+    "sass-embedded": "^1.89.2",
+    "tsx": "^4.20.3",
+    "unocss": "^66.3.3",
+    "unplugin-auto-import": "^19.3.0",
+    "unplugin-vue-components": "^28.8.0"
   }
 }

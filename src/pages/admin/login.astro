@@ -1,0 +1,9 @@
+---
+// 登录 - 长护系统管理端登录
+import LoginComponent from "@/components/auth/login.vue";
+import PageContainer from "@/components/layout/pageContainer.astro";
+---
+
+<PageContainer>
+  <LoginComponent client:only="vue" />
+</PageContainer>
