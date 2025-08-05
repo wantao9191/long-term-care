@@ -13,9 +13,12 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 
 // 生成JWT Token
 export function generateToken(payload: any): string {
-  return jwt.sign(payload, process.env.JWT_SECRET!, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
-  });
+  const secret = process.env.JWT_SECRET;
+  const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
+  if (!secret) {
+    throw new Error('JWT_SECRET 未设置');
+  }
+  return jwt.sign(payload, secret as string, { expiresIn });
 }
 
 // 验证JWT Token

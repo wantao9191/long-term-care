@@ -47,6 +47,7 @@
                 alt="验证码"
                 @click="refreshCaptcha"
                 @error="handleCaptchaError"
+                v-show="states.captchaUrl"
               />
             </div>
           </el-form-item>
@@ -94,7 +95,7 @@ const refreshCaptcha = () => {
 };
 const handleLogin = () => {
   formRef.value?.validate((valid: boolean) => {
-    if (valid) {
+    if (!valid) {
       http.post("/auth/login", states.form).then((res) => {
         console.log(res);
         if (res.code === 200) {
