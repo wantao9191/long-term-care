@@ -95,11 +95,12 @@ const refreshCaptcha = () => {
 };
 const handleLogin = () => {
   formRef.value?.validate((valid: boolean) => {
-    if (!valid) {
+    if (valid) {
       http.post("/auth/login", states.form).then((res) => {
         console.log(res);
         if (res.code === 200) {
           ElMessage.success(res.message);
+          
         } else {
           ElMessage.error(res.message);
         }

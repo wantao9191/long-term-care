@@ -10,50 +10,57 @@ export function formValidator(schema: z.ZodSchema, options?: {
 }) {
   return async (context: APIContext, next: () => Promise<Response>): Promise<Response> => {
     try {
-      // 获取之前中间件解析的数据
-      const requestData = (context as any).validatedData || (context as any).requestData;
-
-      if (!requestData) {
-        throw ApiErrors.BadRequest('请求数据未找到，请确保请求校验中间件已执行');
+      const { request } = context;
+      
+      // 解析请求数据
+      const contentType = request.headers?.get?.('content-type') || '';
+      let requestData: any;
+      
+      try {
+        if (contentType?.includes('application/json')) {
+          requestData = await request.json();
+        } else if (contentType?.includes('application/x-www-form-urlencoded')) {
+          const formData = await request.formData();
+          requestData = Object.fromEntries(formData.entries());
+        } else if (contentType?.includes('multipart/form-data')) {
+          const formData = await request.formData();
+          requestData = Object.fromEntries(formData.entries());
+        } else {
+          throw ApiErrors.BadRequest('不支持的Content-Type');
+        }
+      } catch (error) {
+        if (error instanceof ApiErrors.BadRequest) {
+          throw error;
+        }
+        throw ApiErrors.BadRequest('请求数据解析失败');
       }
 
       // 执行表单验证
       let validatedData;
-
+      
       if (options?.strict) {
         // 严格模式：不允许额外字段
-        validatedData = schema.strict().parse(requestData);
+        validatedData = (schema as any).strict().parse(requestData);
       } else {
         // 普通模式：允许额外字段
         validatedData = schema.parse(requestData);
       }
 
-      // 应用自定义错误消息
-      if (options?.customErrorMessages) {
-        // 这里可以添加自定义错误消息处理逻辑
-      }
-
       // 将验证后的数据存储到context中
       (context as any).formData = validatedData;
 
-      log.info('[表单校验中间件] 表单校验通过', context.request, {
-        url: context.request.url,
-        dataKeys: Object.keys(validatedData)
-      });
-
       return await next();
-
+      
     } catch (error: any) {
       if (error instanceof z.ZodError) {
-
         const errorMessage = JSON.parse(error as any)[0].message
         log.warn('[表单校验中间件] 表单校验失败', {
           errors: errorMessage,
           url: context.request.url
         });
-        throw ApiErrors.BadRequest(`${errorMessage}`);
+        throw ApiErrors.BadRequest(`表单验证失败: ${errorMessage}`);
       }
-
+      
       log.error('[表单校验中间件] 表单校验异常', {
         error: error.message,
         url: context.request.url

@@ -11,9 +11,10 @@ import { formValidator } from "@/lib/middleware/formValidator";
 import { rateLimiter, rateLimitConfigs } from "@/lib/middleware/rateLimiter";
 
 // 登录业务逻辑
-async function loginHandler({ request, cookies }: APIContext): Promise<Response> {
+async function loginHandler(context: APIContext): Promise<Response> {
+  const { request, cookies } = context;
   log.info(`[登录] 开始处理请求`, request);
-  const { username, password, code } = await request.json();
+  const { username, password, code } = (context as any).formData as { username: string, password: string, code: string };
   const captchaData = cookies.get('captcha')?.value;
   if (!captchaData) {
     throw ApiErrors.BadRequest('验证码已过期')
@@ -68,9 +69,3 @@ export const POST: APIRoute = composeMiddlewares(
   formValidator(formSchemas.login),
   loginHandler
 )
-export const GET: APIRoute = ({ params, request }) => {
-  console.log(params)
-  return new Response(JSON.stringify({ message: 'Hello World' }), {
-    status: 200
-  })
-}

@@ -2,8 +2,11 @@ import type { APIContext } from 'astro';
 import { log } from '@/lib/utils';
 import { ApiErrors } from './errorHandler';
 
-// 简单的内存存储（生产环境建议使用Redis）
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+// 限流数据接口
+interface RateLimitData {
+  count: number;
+  resetTime: number;
+}
 
 // 限流中间件
 export function rateLimiter(options: {
@@ -14,7 +17,7 @@ export function rateLimiter(options: {
   skipFailedRequests?: boolean; // 是否跳过失败请求
 }) {
   return async (context: APIContext, next: () => Promise<Response>): Promise<Response> => {
-    const { request } = context;
+    const { request, cookies } = context;
     
     // 生成限流key
     const key = options.keyGenerator ? 
@@ -22,17 +25,26 @@ export function rateLimiter(options: {
       `${request.headers.get('x-forwarded-for') || 'unknown'}:${request.url}`;
 
     const now = Date.now();
-    const windowStart = now - options.windowMs;
-
-    // 获取当前记录
-    const record = rateLimitStore.get(key);
+    const cookieName = `rate_limit_${key.replace(/[^a-zA-Z0-9]/g, '_')}`;
     
-    if (record && record.resetTime > now) {
+    // 从cookie中获取限流数据
+    let rateLimitData: RateLimitData | null = null;
+    const cookieValue = cookies.get(cookieName)?.value;
+    
+    if (cookieValue) {
+      try {
+        rateLimitData = JSON.parse(cookieValue);
+      } catch (error) {
+        log.warn('[限流中间件] 解析cookie数据失败', { cookieValue, error });
+      }
+    }
+    
+    if (rateLimitData && rateLimitData.resetTime > now) {
       // 在时间窗口内
-      if (record.count >= options.maxRequests) {
+      if (rateLimitData.count >= options.maxRequests) {
         log.warn('[限流中间件] 请求被限流', {
           key,
-          count: record.count,
+          count: rateLimitData.count,
           maxRequests: options.maxRequests,
           url: request.url
         });
@@ -41,21 +53,23 @@ export function rateLimiter(options: {
       }
       
       // 增加计数
-      record.count++;
+      rateLimitData.count++;
     } else {
       // 新的时间窗口
-      rateLimitStore.set(key, {
+      rateLimitData = {
         count: 1,
         resetTime: now + options.windowMs
-      });
+      };
     }
 
-    // 清理过期的记录
-    for (const [k, v] of rateLimitStore.entries()) {
-      if (v.resetTime <= now) {
-        rateLimitStore.delete(k);
-      }
-    }
+    // 将限流数据存储到cookie中
+    cookies.set(cookieName, JSON.stringify(rateLimitData), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: Math.ceil(options.windowMs / 1000), // 转换为秒
+      path: '/',
+      sameSite: 'strict'
+    });
 
     return await next();
   };
@@ -66,7 +80,7 @@ export const rateLimitConfigs = {
   // 登录接口限流
   login: {
     windowMs: 15 * 60 * 1000, // 15分钟
-    maxRequests: 5, // 最多5次
+    maxRequests: 20, // 最多5次
     keyGenerator: (context: APIContext) => {
       const ip = context.request.headers.get('x-forwarded-for') || 'unknown';
       return `login:${ip}`;
