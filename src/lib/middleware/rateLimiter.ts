@@ -80,7 +80,7 @@ export const rateLimitConfigs = {
   // 登录接口限流
   login: {
     windowMs: 15 * 60 * 1000, // 15分钟
-    maxRequests: 20, // 最多5次
+    maxRequests: 20, // 最多20次
     keyGenerator: (context: APIContext) => {
       const ip = context.request.headers.get('x-forwarded-for') || 'unknown';
       return `login:${ip}`;
