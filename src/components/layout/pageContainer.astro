@@ -1,15 +1,20 @@
 ---
-// 首页 - 重定向到管理端登录
-import VueApp from "@/components/ui/VueApp.vue";
+// 页面布局容器组件
+export interface Props {
+  title?: string;
+}
+
+const { title = "长期护理管理系统" } = Astro.props;
 ---
 
+<!DOCTYPE html>
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <title>长期护理管理系统</title>
+    <title>{title}</title>
     <style is:global>
       @import "@/styles/common.css";
       @import "element-plus/dist/index.css";
@@ -17,5 +22,24 @@ import VueApp from "@/components/ui/VueApp.vue";
   </head>
   <body>
     <slot />
+    <script>
+      import { pinia } from "@/stores";
+      import useAuthStore from "@/stores/auth";
+      import Cookies from "js-cookie";
+      const token = Cookies.get("long-term-care-token");
+      if (token) {
+        const authStore = useAuthStore(pinia);
+        authStore.login(token);
+        if(window.location.pathname === "/"){
+          window.location.replace("/admin/home");
+        }
+        console.log("已登录");
+      } else {
+        if (window.location.pathname !== "/admin/login") {
+          window.location.replace("/admin/login");
+        }
+        console.log("未登录");
+      }
+    </script>
   </body>
 </html>

@@ -1,0 +1,12 @@
+---
+// 首页 - 长护系统管理端首页
+import PageContainer from "@/components/layout/pageContainer.astro";
+import HomePage from "@/components/home/Page.vue";
+import BasicLayout from "@/components/layout/BasicLayout.vue";
+---
+
+<PageContainer title="管理端首页 - 长期护理管理系统">
+  <BasicLayout client:only="vue">
+    <HomePage client:only="vue" />
+  </BasicLayout>
+</PageContainer>

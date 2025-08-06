@@ -38,13 +38,19 @@ export default defineConfig({
     plugins: [
       AutoImport({
         resolvers: [ElementPlusResolver()],
-        imports: ['vue'],
+        imports: [
+          'vue',
+          'vue/macros',
+          {
+            'vue': ['defineProps', 'defineEmits', 'defineExpose', 'defineModel']
+          }
+        ],
         dts: true,
       }),
-      // Components({
-      //   resolvers: [ElementPlusResolver()],
-      //   dts: true,
-      // }),
+      Components({
+        resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
+        dts: true,
+      }),
     ],
   },
 });

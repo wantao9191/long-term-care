@@ -13,7 +13,7 @@
         <div class="text-2xl text-blue-500 font-bold">欢迎登录长护系统</div>
         <div class="text-sm text-gray-500">专业的长期护理评估与管理平台</div>
         <el-form
-          class="mt-20px"
+          class="mt-20px w-80%"
           :model="states.form"
           ref="formRef"
           :rules="states.rules"
@@ -73,6 +73,10 @@ import {
 } from "element-plus";
 import { User, Lock, CreditCard } from "@element-plus/icons-vue";
 import { http } from "@/lib/http";
+import { pinia } from "@/stores";
+import useAuthStore from "@/stores/auth";
+
+const authStore = useAuthStore(pinia);
 const formRef = ref<FormInstance>();
 const states = reactive({
   form: {
@@ -100,7 +104,8 @@ const handleLogin = () => {
         console.log(res);
         if (res.code === 200) {
           ElMessage.success(res.message);
-          
+          authStore.login(res.data);
+          window.location.replace("/admin/index");
         } else {
           ElMessage.error(res.message);
         }
