@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="1" failures="1" errors="0" time="4.988">
+    <testsuite name="tests/ui/ConfigForm.test.ts" timestamp="2025-08-18T07:31:58.874Z" hostname="LAPTOP-4MJ5QFPV" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="tests/ui/ConfigForm.test.ts" name="tests/ui/ConfigForm.test.ts" time="0">
+            <failure message="expect is not defined" type="ReferenceError">
+ReferenceError: expect is not defined
+ ❯ node_modules/.pnpm/@testing-library+jest-dom@6.7.0/node_modules/@testing-library/jest-dom/dist/index.mjs:9:1
+ ❯ tests/ui/ConfigForm.test.ts:3:31
+            </failure>
+        </testcase>
+    </testsuite>
+</testsuites>
